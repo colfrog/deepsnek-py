@@ -165,7 +165,7 @@ def load_model(agent, save_file):
 	with open(save_file+'.json', 'r') as json_file:
 		json = json_file.read()
 		agent.q_net = model_from_json(json)
-	agent.load_weights(save_file+'.h5')
+	agent.q_net.load_weights(save_file+'.h5')
 
 parser = argparse.ArgumentParser(prog = 'deepsnek')
 parser.add_argument('-t', dest = 'train', action = 'store_true',
@@ -179,7 +179,7 @@ parser.add_argument('--max-steps', dest = 'max_steps', action = 'store', type=in
 args = parser.parse_args()
 
 agent = SnakeAgent(15)
-if os.path.exists(args.save_file):
+if os.path.exists(args.save_file+'.json') and os.path.exists(args.save_file+'.h5'):
 	load_model(agent, args.save_file)
 
 if args.train:
