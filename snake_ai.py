@@ -98,7 +98,7 @@ class SnakeAgent(DQN_Agent):
 		if self.game.apple_eaten:
 			reward += 0.25
 		else:
-			reward -= 0.01
+			reward -= 0.05
 
 		if not self.game.game_over:
 			state = np.copy(self.game.matrix).reshape(1, -1)

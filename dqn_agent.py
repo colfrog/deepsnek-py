@@ -35,7 +35,7 @@ experience = namedtuple('experience', ['state', 'next_state', 'action', 'reward'
 class DQN_Agent():
 	memory = deque([])
 	def __init__(self, q_net,
-		epsilon = EpsilonGreedy(1, 0.1, 0.0005),
+		epsilon = EpsilonGreedy(1, 0.1, 0.00005),
 		discount_factor = 0.1,
 		learning_rate = 1,
 		batch_size = 32,

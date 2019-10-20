@@ -165,6 +165,7 @@ def load_model(agent, save_file):
 	with open(save_file+'.json', 'r') as json_file:
 		json = json_file.read()
 		agent.q_net = model_from_json(json)
+		agent.q_net.compile(loss = 'mean_squared_error', optimizer = 'sgd')
 	agent.q_net.load_weights(save_file+'.h5')
 
 parser = argparse.ArgumentParser(prog = 'deepsnek')
