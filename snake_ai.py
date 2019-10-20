@@ -96,7 +96,7 @@ class SnakeAgent(DQN_Agent):
 			reward += self.game.game_over*0.5
 
 		if self.game.apple_eaten:
-			reward += 0.25
+			reward += 0.75
 		else:
 			reward -= 0.01
 
@@ -111,11 +111,9 @@ class SnakeAgent(DQN_Agent):
 
 	def make_q_network(self):
 		inputs = Input(shape = (self.game.size**2, ))
-		conv1 = Dense(128, activation = 'elu')(inputs)
+		conv1 = Dense(64, activation = 'elu')(inputs)
 		conv2 = Dense(64, activation = 'elu')(conv1)
-		conv3 = Dense(64, activation = 'elu')(conv2)
-		conv4 = Dense(32, activation = 'elu')(conv3)
-		out = Dense(3, activation = 'elu', name = 'left')(conv4)
+		out = Dense(3, activation = 'elu', name = 'left')(conv2)
 		net = Model(inputs=inputs, outputs=out)
 		net.compile(loss='mean_squared_error', optimizer='sgd')
 		return net
