@@ -145,15 +145,18 @@ def start_game(board_size, delay_time = 250):
 	while game_thread.is_alive():
 		show_game(game, ren)
 
-def watch_ai(board_size = 15, agent = None):
+def watch_ai(board_size = 15, agent = None, train = False, min_steps = 10000, max_steps = 50000):
 	if agent is None:
 		agent = SnakeAgent(board_size)
 
 	agent.delay = 250
 	win, ren = init_sdl2(agent.game, 'smart snek')
 	agent.each_step = lambda: show_game(agent.game, ren, agent, False)
-	
-	agent.run()
+
+	if train:
+		agent.train(min_steps, max_steps)
+	else:
+		agent.run()
 
 def save_model(agent, save_file):
 	with open(save_file+'.json', 'w') as json_file:
@@ -169,6 +172,8 @@ def load_model(agent, save_file):
 	agent.q_net.load_weights(save_file+'.h5')
 
 parser = argparse.ArgumentParser(prog = 'deepsnek')
+parser.add_argument('-w', dest = 'watch', action = 'store_true',
+		help = 'Watch the agent even if training')
 parser.add_argument('-t', dest = 'train', action = 'store_true',
 		help = 'Train the agent')
 parser.add_argument('-s', dest = 'save_file', action = 'store', required = True,
@@ -183,8 +188,12 @@ agent = SnakeAgent(15)
 if os.path.exists(args.save_file+'.json') and os.path.exists(args.save_file+'.h5'):
 	load_model(agent, args.save_file)
 
-if args.train:
-	agent.train(args.min_steps or 10000, args.max_steps or 50000)
+min_steps = args.min_steps or 10000
+max_steps = args.max_steps or 50000
+if args.train and args.watch:
+	watch_ai(agent = agent, train = True, min_steps = min_steps, max_steps = max_steps)
+elif args.train:
+	agent.train(min_steps, max_steps)
 else:
 	watch_ai(agent = agent)
 

@@ -71,10 +71,11 @@ class SmartSnakeGame(SnakeGame):
 		self.snake.change_dir(self.snake.dir.relative_dir(turndir))
 
 class SnakeAgent(DQN_Agent):
-	nactions = 3
 	def __init__(self, size, each_step = None, network = None):
+		self.nactions = 3
 		self.each_step = each_step
 		self.game = SmartSnakeGame(size)
+		self.game_matrix = np.copy(self.game.matrix).reshape(1, -1)
 		if network is None:
 			q_net = self.make_q_network()
 		else:
@@ -91,23 +92,24 @@ class SnakeAgent(DQN_Agent):
 
 		self.game.turn_snake(action)
 		self.game.update()
+		self.game_matrix = np.copy(self.game.matrix).reshape(1, -1)
 
 		if self.game.game_over:
-			reward += self.game.game_over*0.5
+			reward += self.game.game_over*0.7
 
 		if self.game.apple_eaten:
-			reward += 0.75
+			reward += 0.1
 		else:
-			reward -= 0.05
+			reward -= 0.01
 
 		if not self.game.game_over:
-			state = np.copy(self.game.matrix).reshape(1, -1)
+			state = self.game_matrix
 
 		return state, reward
 
 	def reinit_env(self):
 		self.game.__init__(self.game.size)
-		return np.copy(self.game.matrix).reshape(1, -1)
+		return self.game_matrix
 
 	def make_q_network(self):
 		inputs = Input(shape = (self.game.size**2, ))
@@ -119,7 +121,7 @@ class SnakeAgent(DQN_Agent):
 		return net
 
 	def train(self, min_steps = 10000, max_steps = 50000):
-		return super().train(np.copy(self.game.matrix).reshape(1, -1), min_steps, max_steps)
+		return super().train(self.game_matrix, min_steps, max_steps)
 
 	def run(self):
-		return super().run(np.copy(self.game.matrix).reshape(1, -1))
+		return super().run(self.game_matrix)

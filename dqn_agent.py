@@ -7,7 +7,7 @@ import numpy as np
 def max_index(array):
 	maxval = None
 	maxindex = 0
-	for i in range(0, len(array)):
+	for i in range(len(array)):
 		try:
 			test = iter(array[i])
 			_, val = max_index(array[i])
@@ -40,7 +40,7 @@ class DQN_Agent():
 		learning_rate = 1,
 		batch_size = 32,
 		memory_len = 1000,
-		steps_to_target_net_update = 100):
+                steps_to_target_net_update = 100):
 		self.epsilon = epsilon
 		self.discount_factor = discount_factor
 		self.learning_rate = learning_rate
@@ -78,11 +78,12 @@ class DQN_Agent():
 			return self.exploit_action(state)
 
 	def sort_sample(self, sample):
-		states = []
-		targets = []
+		states = np.zeros((len(sample), sample[0].state.shape[1]))
+		targets = np.zeros((len(sample), 3))
 
+		i = 0
 		for e in sample:
-			states.append(e.state[0])
+			states[i] = e.state[0]
 
 			if e.next_state is None:
 				next_max_q = 0
@@ -91,9 +92,9 @@ class DQN_Agent():
 
 			target = self.q_net.predict(e.state)[0]
 			target[e.action] = e.reward + self.discount_factor*next_max_q
-			targets.append(target)
+			targets[i] = target
 
-		return np.array(states), np.array(targets)
+		return states, targets
 
 	def teach_sample(self):
 		sample = random.sample(self.memory, self.batch_size)
